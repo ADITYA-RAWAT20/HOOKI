@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HOOKI</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0E1A16">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0E1A16;--card:#142520;--line:#2A3F36;--line2:#3B5148;--text:#F1EFE8;--muted:#B9C5BE;--accent:#F2B544;--ink:#0E1A16;--tile:#17302A;--bubble:#0A130F}
@@ -156,6 +160,7 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
 </div>
 
 <script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 const CITIES = ['Almora','Bageshwar','Champawat','Dehradun','Gopeshwar','Haldwani','Haridwar','Kashipur','Kotdwar','Lansdowne','Mussoorie','Nainital','Pauri','Pithoragarh','Ramnagar','Ranikhet','Rishikesh','Roorkee','Rudraprayag','Rudrapur','Srinagar','Tehri','Uttarkashi','Vikasnagar'];
 const $ = (id) => document.getElementById(id);
 const show = (id) => { document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === id)); };
