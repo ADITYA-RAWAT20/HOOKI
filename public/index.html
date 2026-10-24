@@ -163,6 +163,7 @@ const show = (id) => { document.querySelectorAll('.screen').forEach((s) => s.cla
 let profile = { gender: '', city: '', vibe: '' };
 let want = { gender: '', city: '', vibe: '' };
 let mode = 'video';
+let iceServers = [{ urls: 'stun:stun.l.google.com:19302' }];
 let ws, myId, pc, localStream, peerId = null, peerTags = null, history = [], pendingAsk = null, searching = false;
 const ignored = new Set();
 
@@ -216,6 +217,7 @@ async function startChat() {
       sys('Camera or microphone unavailable, so this is a text-only chat. Camera works on https or localhost only.');
     }
   }
+  try { iceServers = await (await fetch('/ice')).json(); } catch {}
   if (!ws || ws.readyState !== 1) await connect();
   join();
 }
@@ -240,8 +242,9 @@ async function onMatched(m) {
   searching = false; clearChat(); closePC();
   peerId = m.peerId; peerTags = m.peer; setTags(m.peer); setStatus('');
   sys('You are now chatting with a stranger from Uttarakhand. Say namaste.');
+  if (m.mode === 'text' && mode === 'video') sys('This chat is text only because the other person is not sharing a camera.');
   if (m.mode === 'video' && localStream) {
-    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    pc = new RTCPeerConnection({ iceServers });
     localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
     pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; };
     pc.onicecandidate = (e) => e.candidate && out({ type: 'signal', data: { candidate: e.candidate } });
