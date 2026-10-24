@@ -10,6 +10,17 @@ const REPORTS_TO_BLOCK = 3;
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
+
+// WebRTC relay settings. Free STUN always; add a TURN server with environment variables
+// TURN_URL, TURN_USER, TURN_PASS so video also works on strict mobile networks.
+app.get('/ice', (req, res) => {
+  const iceServers = [{ urls: 'stun:stun.l.google.com:19302' }];
+  if (process.env.TURN_URL) {
+    iceServers.push({ urls: process.env.TURN_URL.split(','), username: process.env.TURN_USER, credential: process.env.TURN_PASS });
+  }
+  res.json(iceServers);
+});
+app.get('/healthz', (req, res) => res.send('ok'));
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 
@@ -29,7 +40,8 @@ function accepts(want, profile) {
   if (want.vibe && want.vibe !== profile.vibe) return false;
   return true;
 }
-const compatible = (a, b) => a.mode === b.mode && accepts(a.want, b.profile) && accepts(b.want, a.profile);
+// Video and text-only users can match each other; the chat then runs as text if either side has no video.
+const compatible = (a, b) => accepts(a.want, b.profile) && accepts(b.want, a.profile);
 
 function unpair(c, notify = true) {
   const p = c.partner;
@@ -55,7 +67,8 @@ function search(c) {
 }
 
 wss.on('connection', (ws, req) => {
-  const ip = req.socket.remoteAddress;
+  // Behind a host's proxy the real visitor address is in x-forwarded-for.
+  const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress).split(',')[0].trim();
   if (blockedIps.has(ip)) { ws.close(4003, 'blocked'); return; }
 
   const c = { id: crypto.randomBytes(6).toString('hex'), ws, ip, profile: {}, want: {}, mode: 'text', partner: null, stamps: [], ignored: new Set() };
