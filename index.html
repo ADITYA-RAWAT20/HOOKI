@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOOKI</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0E1A16;--card:#142520;--line:#2A3F36;--line2:#3B5148;--text:#F1EFE8;--muted:#B9C5BE;--accent:#F2B544;--ink:#0E1A16;--tile:#17302A;--bubble:#0A130F}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Instrument Sans',system-ui,sans-serif;min-height:100vh}
+h1,h2,h3,.brand{font-family:'Bricolage Grotesque',sans-serif;margin:0}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.on{display:flex}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line)}
+.brand{font-weight:800;font-size:24px;letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);border-radius:999px;padding:6px 14px;font-size:14px;color:#D9D6CB}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.btn{min-height:48px;padding:0 24px;border-radius:12px;border:0;background:var(--accent);color:var(--ink);font-weight:600;font-size:16px}
+.btn.big{min-height:56px;padding:0 32px;font-size:18px;border-radius:14px}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.wrap{max-width:1040px;width:100%;margin:0 auto;padding:40px 24px;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero h1{font-size:clamp(40px,7vw,68px);line-height:1.03;letter-spacing:-.02em}
+.hero p{font-size:19px;line-height:1.55;color:#D9D6CB;max-width:540px;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{min-height:44px;padding:0 20px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--text);font-weight:600}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+select{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bubble);color:var(--text);max-width:320px}
+label.h{font-weight:600;display:block;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.note{font-size:13px;color:var(--muted);line-height:1.5}
+/* chat */
+.body{flex:1;display:flex;flex-wrap:wrap;gap:20px;padding:20px 24px}
+.left{flex:2 1 520px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.right{flex:1 1 320px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;max-height:calc(100vh - 110px);min-height:420px}
+.stage{position:relative;flex:1;min-height:360px;border-radius:22px;background:var(--tile);overflow:hidden}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--tile)}
+.self{position:absolute;right:14px;bottom:14px;width:150px;height:112px;border-radius:12px;border:2px solid #33493F;overflow:hidden;background:var(--bubble);z-index:2}
+.self video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.tags{position:absolute;left:14px;top:14px;display:flex;flex-wrap:wrap;gap:8px;z-index:2}
+.tag{background:rgba(10,19,15,.8);border-radius:999px;padding:7px 13px;font-size:14px}
+.tag.v{background:var(--accent);color:var(--ink);font-weight:600}
+.status{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font-size:20px;color:#D9D6CB;z-index:1}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.round{width:54px;height:54px;border-radius:50%;border:1px solid var(--line2);background:#1E3D34;color:var(--text);display:grid;place-items:center}
+.round[aria-pressed=false]{background:var(--text);color:var(--ink)}
+.tabs{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;min-height:42px;border:0;border-radius:12px;background:transparent;color:var(--text);font-weight:600}
+.tabs button[aria-pressed=true]{background:var(--text);color:var(--ink)}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;font-size:15px;line-height:1.45}
+.m{max-width:84%;padding:9px 13px;border-radius:15px;word-wrap:break-word}
+.m.them{align-self:flex-start;background:var(--bubble);border-bottom-left-radius:4px}
+.m.me{align-self:flex-end;background:var(--accent);color:var(--ink);border-bottom-right-radius:4px}
+.m.sys{align-self:center;background:none;color:var(--muted);font-size:13px;text-align:center}
+.send{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line)}
+.send input{flex:1;min-width:0;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bubble);color:var(--text)}
+.hist{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.h{background:var(--bubble);border:1px solid var(--line);border-radius:14px;padding:13px;display:flex;flex-direction:column;gap:10px}
+.h .l{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.on-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:#6C7F76}
+.on-dot.y{background:#7FD6A6}
+.toast{position:fixed;left:12px;right:12px;top:12px;max-width:420px;margin:0 auto;background:var(--text);color:var(--ink);border-radius:18px;padding:16px;z-index:50;display:none;flex-direction:column;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.toast.on{display:flex}
+.toast .row .btn{flex:1;background:var(--ink);color:var(--text)}
+.toast .row .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.err{color:#FFB4A8;font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<section id="landing" class="screen on">
+  <div class="top">
+    <div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 34 34"><path d="M5 25 L12 14 L16 20 L21 11 L29 25 Z" fill="#0E1A16"/></svg></span>HOOKI</div>
+    <span class="pill"><span class="dot"></span>Uttarakhand server</span>
+  </div>
+  <div class="wrap hero" style="flex:1;justify-content:center">
+    <span class="eyebrow">Video and text chat · Uttarakhand only</span>
+    <h1>Talk to a stranger from the hills.</h1>
+    <p>HOOKI connects you with a random person in Uttarakhand, face to face or by text. No sign-up, no name, no profile.</p>
+    <div class="row" style="gap:14px">
+      <input id="age" type="checkbox" style="width:22px;height:22px;accent-color:#F2B544">
+      <label for="age">I am 18 or older and agree to the house rules.</label>
+    </div>
+    <div class="row">
+      <button class="btn big" id="goVideo">Start video chat</button>
+      <button class="btn big ghost" id="goText">Text only</button>
+    </div>
+    <div id="ageErr" class="err" hidden>Please confirm you are 18 or older.</div>
+    <p class="note">Be kind. Reported people are blocked. You can press Next at any moment.</p>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section id="setup" class="screen">
+  <div class="top"><div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 34 34"><path d="M5 25 L12 14 L16 20 L21 11 L29 25 Z" fill="#0E1A16"/></svg></span>HOOKI</div><span class="pill"><span class="dot"></span>Uttarakhand server</span></div>
+  <div class="wrap">
+    <div><span class="eyebrow">Optional</span><h2 style="font-size:40px;margin-top:8px">A little about you, no name needed.</h2></div>
+    <div><label class="h">I am a</label><div class="row" id="gRow"></div></div>
+    <div><label class="h" for="city">My city or town</label><select id="city"></select></div>
+    <div><label class="h">My vibe</label><div class="row" id="vRow"></div></div>
+    <div class="card">
+      <h3 style="font-size:20px">Who do you want to meet?</h3>
+      <div><label class="h">Gender</label><div class="row" id="wgRow"></div></div>
+      <div><label class="h" for="wcity">City or town</label><select id="wcity"></select></div>
+      <div><label class="h">Vibe</label><div class="row" id="wvRow"></div></div>
+      <p class="note">Matching is free in this build. Tighter filters mean longer waits, so keep them wide if nobody shows up.</p>
+    </div>
+    <div class="row"><button class="btn big" id="begin">Start chatting</button><button class="btn big ghost" id="skip">Skip, stay anonymous</button></div>
+    <p class="note">Tags are self-declared and not verified. Playful is fine; explicit behaviour gets you banned.</p>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="screen">
+  <div class="top">
+    <div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 34 34"><path d="M5 25 L12 14 L16 20 L21 11 L29 25 Z" fill="#0E1A16"/></svg></span>HOOKI</div>
+    <div class="row"><span class="pill"><span class="dot"></span>Uttarakhand server · <span id="online">1</span> online</span>
+      <button class="btn ghost" id="report">Report</button>
+      <button class="btn ghost" id="leave">Leave</button></div>
+  </div>
+  <div class="body">
+    <div class="left">
+      <div class="stage">
+        <video id="remote" autoplay playsinline></video>
+        <div class="tags" id="peerTags"></div>
+        <div class="status" id="status">Looking for someone in Uttarakhand…</div>
+        <div class="self" id="selfBox"><video id="local" autoplay playsinline muted></video></div>
+      </div>
+      <div class="ctrls">
+        <div class="row">
+          <button class="round" id="mic" aria-pressed="true" aria-label="Toggle microphone"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <button class="round" id="cam" aria-pressed="true" aria-label="Toggle camera"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></button>
+        </div>
+        <button class="btn big" id="next">Next stranger</button>
+      </div>
+    </div>
+    <div class="right">
+      <div class="tabs"><button id="tChat" aria-pressed="true">Text chat</button><button id="tRecent" aria-pressed="false">Recent · <span id="rc">0</span></button></div>
+      <div id="paneChat" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div class="msgs" id="msgs"></div>
+        <form class="send" id="form"><input id="txt" placeholder="Type a message" autocomplete="off" maxlength="500"><button class="btn" type="submit">Send</button></form>
+      </div>
+      <div id="paneRecent" class="hist" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="alert">
+  <div><strong id="toastT">A stranger wants to talk again</strong><div class="note" id="toastB" style="color:#2C3A34"></div><div class="note" style="color:#2C3A34">Rejoining ends your current chat.</div></div>
+  <div class="row"><button class="btn" id="tYes">Rejoin</button><button class="btn ghost" id="tNo">Not now</button><button class="btn ghost" id="tBlock">Block</button></div>
+</div>
+
+<script>
+const CITIES = ['Almora','Bageshwar','Champawat','Dehradun','Gopeshwar','Haldwani','Haridwar','Kashipur','Kotdwar','Lansdowne','Mussoorie','Nainital','Pauri','Pithoragarh','Ramnagar','Ranikhet','Rishikesh','Roorkee','Rudraprayag','Rudrapur','Srinagar','Tehri','Uttarkashi','Vikasnagar'];
+const $ = (id) => document.getElementById(id);
+const show = (id) => { document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === id)); };
+
+let profile = { gender: '', city: '', vibe: '' };
+let want = { gender: '', city: '', vibe: '' };
+let mode = 'video';
+let ws, myId, pc, localStream, peerId = null, peerTags = null, history = [], pendingAsk = null, searching = false;
+const ignored = new Set();
+
+// ---------- setup screen ----------
+function chips(rowId, options, key, target) {
+  const row = $(rowId);
+  options.forEach((o) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = o.label; b.setAttribute('aria-pressed', target[key] === o.value);
+    b.onclick = () => { target[key] = target[key] === o.value && o.value !== '' ? '' : o.value; [...row.children].forEach((x, i) => x.setAttribute('aria-pressed', options[i].value === target[key])); };
+    row.appendChild(b);
+  });
+}
+chips('gRow', [{ label: 'Man', value: 'Man' }, { label: 'Woman', value: 'Woman' }], 'gender', profile);
+chips('vRow', [{ label: 'Chill', value: 'Chill' }, { label: 'Normal', value: 'Normal' }, { label: 'Naughty', value: 'Naughty' }], 'vibe', profile);
+chips('wgRow', [{ label: 'Anyone', value: '' }, { label: 'Man', value: 'Man' }, { label: 'Woman', value: 'Woman' }], 'gender', want);
+chips('wvRow', [{ label: 'Any', value: '' }, { label: 'Chill', value: 'Chill' }, { label: 'Normal', value: 'Normal' }, { label: 'Naughty', value: 'Naughty' }], 'vibe', want);
+[['city', 'Prefer not to say'], ['wcity', 'Any city']].forEach(([id, first]) => {
+  $(id).innerHTML = '<option value="">' + first + '</option>' + CITIES.map((c) => '<option>' + c + '</option>').join('');
+});
+
+$('goVideo').onclick = () => gate('video');
+$('goText').onclick = () => gate('text');
+function gate(m) {
+  if (!$('age').checked) { $('ageErr').hidden = false; return; }
+  $('ageErr').hidden = true; mode = m; show('setup');
+}
+$('begin').onclick = () => { profile.city = $('city').value; want.city = $('wcity').value; startChat(); };
+$('skip').onclick = () => { profile = { gender: '', city: '', vibe: '' }; want = { gender: '', city: '', vibe: '' }; startChat(); };
+
+// ---------- connection ----------
+function connect() {
+  return new Promise((resolve) => {
+    ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+    ws.onopen = resolve;
+    ws.onmessage = (e) => handle(JSON.parse(e.data));
+    ws.onclose = (e) => { if (e.code === 4003) setStatus('You have been blocked after repeated reports.'); else setStatus('Disconnected. Refresh to reconnect.'); };
+  });
+}
+const out = (m) => ws && ws.readyState === 1 && ws.send(JSON.stringify(m));
+
+async function startChat() {
+  show('chat');
+  $('selfBox').style.display = mode === 'video' ? 'block' : 'none';
+  if (mode === 'video') {
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      $('local').srcObject = localStream;
+    } catch (err) {
+      mode = 'text'; $('selfBox').style.display = 'none';
+      sys('Camera or microphone unavailable, so this is a text-only chat. Camera works on https or localhost only.');
+    }
+  }
+  if (!ws || ws.readyState !== 1) await connect();
+  join();
+}
+function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want, mode }); }
+
+function handle(m) {
+  switch (m.type) {
+    case 'hello': myId = m.id; $('online').textContent = m.online; break;
+    case 'searching': searching = true; setStatus('Looking for someone in Uttarakhand…'); break;
+    case 'matched': onMatched(m); break;
+    case 'signal': onSignal(m.data); break;
+    case 'chat': add('them', m.text); break;
+    case 'partner-left': remember(); closePC(); sys('The stranger left. Press Next to meet someone new, or find them in Recent.'); setStatus('The stranger left.'); setTags(null); break;
+    case 'presence': renderRecent(m.online); break;
+    case 'ask-from': if (!ignored.has(m.from)) showAsk(m); break;
+    case 'ask-failed': sys('That person is no longer online.'); break;
+  }
+}
+
+// ---------- matching and WebRTC ----------
+async function onMatched(m) {
+  searching = false; clearChat(); closePC();
+  peerId = m.peerId; peerTags = m.peer; setTags(m.peer); setStatus('');
+  sys('You are now chatting with a stranger from Uttarakhand. Say namaste.');
+  if (m.mode === 'video' && localStream) {
+    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+    pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; };
+    pc.onicecandidate = (e) => e.candidate && out({ type: 'signal', data: { candidate: e.candidate } });
+    if (m.initiator) {
+      const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+      out({ type: 'signal', data: { sdp: pc.localDescription } });
+    }
+  }
+}
+async function onSignal(d) {
+  if (!pc) return;
+  if (d.sdp) {
+    await pc.setRemoteDescription(d.sdp);
+    if (d.sdp.type === 'offer') { const a = await pc.createAnswer(); await pc.setLocalDescription(a); out({ type: 'signal', data: { sdp: pc.localDescription } }); }
+  } else if (d.candidate) { try { await pc.addIceCandidate(d.candidate); } catch {} }
+}
+function closePC() { if (pc) { pc.close(); pc = null; } $('remote').srcObject = null; }
+
+// ---------- chat ui ----------
+function add(who, text) { const d = document.createElement('div'); d.className = 'm ' + who; d.textContent = text; $('msgs').appendChild(d); $('msgs').scrollTop = 1e9; }
+const sys = (t) => add('sys', t);
+function clearChat() { $('msgs').innerHTML = ''; }
+function setStatus(t) { $('status').textContent = t; $('status').style.display = t ? 'grid' : 'none'; }
+function setTags(p) {
+  const box = $('peerTags'); box.innerHTML = '';
+  if (!p) return;
+  const parts = [p.gender, p.city, p.vibe].filter(Boolean);
+  if (!parts.length) parts.push('Anonymous');
+  parts.forEach((t, i) => { const s = document.createElement('span'); s.className = 'tag' + (t === p.vibe ? ' v' : ''); s.textContent = t; box.appendChild(s); });
+}
+$('form').onsubmit = (e) => { e.preventDefault(); const t = $('txt').value.trim(); if (!t || !peerId) return; out({ type: 'chat', text: t }); add('me', t); $('txt').value = ''; };
+$('next').onclick = () => { remember(); closePC(); setTags(null); peerId = null; join2(); };
+function join2() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'next' }); }
+$('report').onclick = () => { if (!peerId) return; out({ type: 'report', reason: 'user report' }); sys('Reported. Thank you.'); $('next').click(); };
+$('leave').onclick = () => { out({ type: 'stop' }); closePC(); if (localStream) localStream.getTracks().forEach((t) => t.stop()); localStream = null; peerId = null; setTags(null); show('landing'); };
+$('mic').onclick = (e) => toggle(e.currentTarget, 'audio');
+$('cam').onclick = (e) => toggle(e.currentTarget, 'video');
+function toggle(btn, kind) {
+  if (!localStream) return;
+  const on = btn.getAttribute('aria-pressed') !== 'true';
+  btn.setAttribute('aria-pressed', on);
+  localStream.getTracks().filter((t) => t.kind === kind).forEach((t) => (t.enabled = on));
+}
+
+// ---------- recent + reconnect ----------
+function remember() {
+  if (!peerId || !peerTags) return;
+  history = [{ id: peerId, tags: peerTags, at: Date.now() }, ...history.filter((h) => h.id !== peerId)].slice(0, 5);
+  $('rc').textContent = history.length; peerId = null;
+}
+const label = (t) => [t.gender, t.city, t.vibe].filter(Boolean).join(' · ') || 'Anonymous stranger';
+function renderRecent(online = {}) {
+  const box = $('paneRecent'); box.innerHTML = '<p class="note">Your last 5 chats. Cleared when you close HOOKI. Nobody sees your name, only the request.</p>';
+  const cutoff = Date.now() - 30 * 60 * 1000;
+  history = history.filter((h) => h.at > cutoff); $('rc').textContent = history.length;
+  if (!history.length) box.innerHTML += '<p>No recent chats yet.</p>';
+  history.forEach((h) => {
+    const d = document.createElement('div'); d.className = 'h';
+    const on = !!online[h.id];
+    const mins = Math.max(0, Math.round((Date.now() - h.at) / 60000));
+    d.innerHTML = '<div class="l"><div><strong></strong><div class="note">' + (mins ? mins + ' min ago' : 'Just now') + '</div></div><span class="note"><i class="on-dot ' + (on ? 'y' : '') + '"></i>' + (on ? 'Online' : 'Offline') + '</span></div>';
+    d.querySelector('strong').textContent = label(h.tags);
+    const b = document.createElement('button'); b.className = 'btn'; b.textContent = on ? 'Ask to reconnect' : "Can't connect while they are offline"; b.disabled = !on; b.style.minHeight = '44px';
+    if (!on) { b.className = 'btn ghost'; b.style.opacity = .7; }
+    b.onclick = () => { out({ type: 'ask', to: h.id }); b.disabled = true; b.textContent = 'Request sent. Waiting for them to rejoin.'; };
+    d.appendChild(b); box.appendChild(d);
+  });
+}
+function tab(which) {
+  $('tChat').setAttribute('aria-pressed', which === 'chat'); $('tRecent').setAttribute('aria-pressed', which === 'recent');
+  $('paneChat').style.display = which === 'chat' ? 'flex' : 'none'; $('paneRecent').style.display = which === 'recent' ? 'flex' : 'none';
+  if (which === 'recent') { renderRecent(); out({ type: 'presence', ids: history.map((h) => h.id) }); }
+}
+$('tChat').onclick = () => tab('chat'); $('tRecent').onclick = () => tab('recent');
+
+function showAsk(m) {
+  pendingAsk = m; $('toastB').textContent = 'Someone (' + label(m.peer) + ') who you chatted with is online and asked to reconnect. They stay anonymous.';
+  $('toast').classList.add('on');
+}
+$('tYes').onclick = () => { $('toast').classList.remove('on'); if (pendingAsk) out({ type: 'accept', to: pendingAsk.from }); pendingAsk = null; };
+$('tNo').onclick = () => { $('toast').classList.remove('on'); pendingAsk = null; };
+$('tBlock').onclick = () => { if (pendingAsk) { ignored.add(pendingAsk.from); out({ type: 'block', to: pendingAsk.from }); } $('toast').classList.remove('on'); pendingAsk = null; };
+</script>
+</body>
+</html>
