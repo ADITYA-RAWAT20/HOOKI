@@ -49,6 +49,7 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
 .tag{background:rgba(10,19,15,.8);border-radius:999px;padding:7px 13px;font-size:14px}
 .tag.v{background:var(--accent);color:var(--ink);font-weight:600}
 .status{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font-size:20px;color:#D9D6CB;z-index:1}
+.navonly{display:none}
 .ctrls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .round{width:54px;height:54px;border-radius:50%;border:1px solid var(--line2);background:#1E3D34;color:var(--text);display:grid;place-items:center}
 .round[aria-pressed=false]{background:var(--text);color:var(--ink)}
@@ -73,34 +74,50 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
 .toast .row .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
 .err{color:#FFB4A8;font-size:14px}
 
-/* ---------- phone layout: video on top, text chat below ---------- */
+/* ---------- phone layout: two stacked video tiles (stranger on top, you below), chat floats over the lower tile, control bar at the bottom ---------- */
 @media (max-width:900px),(pointer:coarse) and (max-width:1200px){
+  html{-webkit-text-size-adjust:100%}
+  #chat{--nav:21vw}
   #chat.screen.on{height:100vh;height:100dvh;min-height:0;overflow:hidden}
-  #chat .top{padding:8px 12px;gap:8px;flex-wrap:nowrap}
+  #chat .top{padding:1.5vw 3vw;gap:2vw;flex-wrap:nowrap;border-bottom:0}
   #chat .top .pill{display:none}
-  #chat .top .brand{font-size:20px}
-  #chat .top .row{gap:8px;flex-wrap:nowrap}
-  #chat .top .btn{min-height:40px;padding:0 14px;font-size:14px}
-  #chat .body{flex-direction:column;flex-wrap:nowrap;gap:0;padding:0;flex:1;min-height:0}
-  #chat .left{flex:0 0 auto;gap:8px;padding:8px 10px 10px}
-  #chat .stage{flex:none;height:40vh;height:40dvh;min-height:200px;border-radius:16px}
-  #chat .self{width:92px;height:70px;right:8px;bottom:8px}
-  #chat .tags{left:8px;top:8px;gap:6px}
-  #chat .tag{font-size:12px;padding:5px 10px}
-  #chat .status{font-size:16px}
-  #chat .ctrls{flex-wrap:nowrap;gap:10px}
-  #chat .round{width:46px;height:46px}
-  #chat .btn.big{min-height:46px;padding:0 18px;font-size:16px;flex:1}
-  #chat .right{flex:1;min-height:0;max-height:none;border-radius:18px 18px 0 0;border-width:1px 0 0}
-  #chat .tabs{padding:6px 8px}
-  #chat .tabs button{min-height:38px}
-  #chat #paneChat{min-height:0}
-  #chat .msgs{padding:12px;gap:7px}
-  #chat .hist{min-height:0}
-  #chat .send{padding:8px 10px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
-  #chat .send input{font-size:16px;min-height:44px}
-  .wrap{padding:28px 16px}
-  .toast{top:8px}
+  #chat .top .brand{font-size:5.5vw;gap:2vw}
+  #chat .top .logo{width:8vw;height:8vw;border-radius:2.2vw}
+  #chat .top .logo svg{width:5vw;height:5vw}
+  #chat .top .row{gap:2vw;flex-wrap:nowrap}
+  #chat .top .btn{min-height:9.5vw;padding:0 4vw;font-size:3.8vw;border-radius:3vw}
+  #chat .body{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;flex-wrap:nowrap;gap:0;padding:0}
+  #chat .left{flex:1;min-height:0;gap:0;padding:0}
+  #chat .stage{flex:1;min-height:0;border-radius:0;background:var(--bg);overflow:hidden}
+  #chat .stage video#remote{height:calc(50% - 1px);border-radius:0}
+  #chat .stage .status{bottom:50%;font-size:4.8vw;padding:6vw}
+  #chat .tags{left:3vw;top:3vw;gap:1.5vw}
+  #chat .tag{font-size:3.4vw;padding:1.2vw 2.8vw}
+  #chat .self{left:0;right:0;top:calc(50% + 1px);bottom:0;width:auto;height:auto;border:0;border-radius:0;background:var(--tile)}
+  #chat .ctrls{flex:0 0 var(--nav);flex-wrap:nowrap;gap:3vw;padding:0 4vw;background:var(--card);border-top:1px solid var(--line);align-items:center;justify-content:space-between;padding-bottom:env(safe-area-inset-bottom)}
+  #chat .ctrls .row{display:contents}
+  #chat .round{width:13vw;height:13vw;flex:none}
+  #chat .round svg{width:6vw;height:6vw}
+  #chat .navonly{display:grid}
+  #chat .btn.big{min-height:14vw;padding:0 4vw;font-size:5vw;flex:1;border-radius:7vw}
+  /* chat floats over the lower tile, just above the control bar */
+  #chat .right{position:absolute;left:0;right:0;bottom:var(--nav);top:auto;max-height:46%;min-height:0;background:transparent;border:0;border-radius:0;overflow:visible;pointer-events:none;z-index:5}
+  #chat .tabs{display:none}
+  #chat #paneChat{min-height:0;justify-content:flex-end}
+  #chat .msgs{flex:0 1 auto;max-height:32dvh;padding:2vw 3vw;gap:1.5vw;font-size:4.4vw;background:none}
+  #chat .m{background:rgba(10,19,15,.72);color:var(--text);backdrop-filter:blur(4px)}
+  #chat .m.me{background:var(--accent);color:var(--ink)}
+  #chat .m.sys{background:none;color:#D9D6CB;text-shadow:0 1px 3px #000}
+  #chat .send{pointer-events:auto;padding:2.5vw 3vw;gap:2.5vw;border:0;background:linear-gradient(transparent,rgba(10,19,15,.85))}
+  #chat .send input{font-size:4.6vw;min-height:12vw;border-radius:6vw;padding:0 5vw;background:rgba(10,19,15,.8)}
+  #chat .send .btn{min-height:12vw;font-size:4.4vw;padding:0 6vw;border-radius:6vw}
+  /* Recent list: full overlay while open */
+  #chat.showrecent .right{top:0;max-height:none;background:var(--bg);pointer-events:auto}
+  #chat.showrecent .tabs{display:flex;padding:2vw}
+  #chat.showrecent .tabs button{min-height:11vw;font-size:4.4vw}
+  #chat.showrecent .hist{font-size:4.2vw;padding:3vw}
+  #chat.showrecent #navRecent{background:var(--text);color:var(--ink)}
+  .toast{top:2vw;font-size:4vw}
 }
 </style>
 </head>
@@ -171,6 +188,7 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
           <button class="round" id="cam" aria-pressed="true" aria-label="Toggle camera"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg></button>
         </div>
         <button class="btn big" id="next">Next stranger</button>
+        <button class="round navonly" id="navRecent" aria-label="Recent chats"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></button>
       </div>
     </div>
     <div class="right">
@@ -372,6 +390,8 @@ function tab(which) {
   if (which === 'recent') { renderRecent(); out({ type: 'presence', ids: history.map((h) => h.id) }); }
 }
 $('tChat').onclick = () => tab('chat'); $('tRecent').onclick = () => tab('recent');
+$('navRecent').onclick = () => { const on = $('chat').classList.toggle('showrecent'); tab(on ? 'recent' : 'chat'); };
+$('tChat').addEventListener('click', () => $('chat').classList.remove('showrecent'));
 
 function showAsk(m) {
   pendingAsk = m; $('toastB').textContent = 'Someone (' + label(m.peer) + ') who you chatted with is online and asked to reconnect. They stay anonymous.';
