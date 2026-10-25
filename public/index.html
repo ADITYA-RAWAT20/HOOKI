@@ -169,6 +169,7 @@ let profile = { gender: '', city: '', vibe: '' };
 let want = { gender: '', city: '', vibe: '' };
 let mode = 'video';
 let iceServers = [{ urls: 'stun:stun.l.google.com:19302' }];
+let camNote = '';
 let ws, myId, pc, localStream, peerId = null, peerTags = null, history = [], pendingAsk = null, searching = false;
 const ignored = new Set();
 
@@ -219,7 +220,8 @@ async function startChat() {
       $('local').srcObject = localStream;
     } catch (err) {
       mode = 'text'; $('selfBox').style.display = 'none';
-      sys('Camera or microphone unavailable, so this is a text-only chat. Camera works on https or localhost only.');
+      camNote = 'Camera or microphone could not start (' + (err && err.name ? err.name : 'unknown') + '). This is a text chat. Press the camera button to try again.';
+      sys(camNote);
     }
   }
   try { iceServers = await (await fetch('/ice')).json(); } catch {}
@@ -247,6 +249,7 @@ async function onMatched(m) {
   searching = false; clearChat(); closePC();
   peerId = m.peerId; peerTags = m.peer; setTags(m.peer); setStatus(m.mode === 'video' && localStream ? 'Connecting video…' : '');
   sys('You are now chatting with a stranger from Uttarakhand. Say namaste.');
+  if (camNote) sys(camNote);
   if (m.mode === 'text' && mode === 'video') sys('This chat is text only because the other person is not sharing a camera.');
   if (m.mode === 'video' && localStream) {
     pc = new RTCPeerConnection({ iceServers });
@@ -291,8 +294,19 @@ $('report').onclick = () => { if (!peerId) return; out({ type: 'report', reason:
 $('leave').onclick = () => { out({ type: 'stop' }); closePC(); if (localStream) localStream.getTracks().forEach((t) => t.stop()); localStream = null; peerId = null; setTags(null); show('landing'); };
 $('mic').onclick = (e) => toggle(e.currentTarget, 'audio');
 $('cam').onclick = (e) => toggle(e.currentTarget, 'video');
+async function retryMedia() {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    $('local').srcObject = localStream; $('selfBox').style.display = 'block';
+    mode = 'video'; camNote = ''; sys('Camera is on. Finding you a video chat…');
+    join();
+  } catch (err) {
+    camNote = 'Still no camera (' + (err && err.name ? err.name : 'unknown') + '). Check the camera icon in the address bar and Windows camera privacy.';
+    sys(camNote);
+  }
+}
 function toggle(btn, kind) {
-  if (!localStream) return;
+  if (!localStream) { retryMedia(); return; }
   const on = btn.getAttribute('aria-pressed') !== 'true';
   btn.setAttribute('aria-pressed', on);
   localStream.getTracks().filter((t) => t.kind === kind).forEach((t) => (t.enabled = on));
