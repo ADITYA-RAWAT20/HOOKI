@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HOOKI</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#0E1A16">
@@ -72,6 +72,36 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
 .toast .row .btn{flex:1;background:var(--ink);color:var(--text)}
 .toast .row .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
 .err{color:#FFB4A8;font-size:14px}
+
+/* ---------- phone layout: video on top, text chat below ---------- */
+@media (max-width:760px){
+  #chat.screen.on{height:100vh;height:100dvh;min-height:0;overflow:hidden}
+  #chat .top{padding:8px 12px;gap:8px;flex-wrap:nowrap}
+  #chat .top .pill{display:none}
+  #chat .top .brand{font-size:20px}
+  #chat .top .row{gap:8px;flex-wrap:nowrap}
+  #chat .top .btn{min-height:40px;padding:0 14px;font-size:14px}
+  #chat .body{flex-direction:column;flex-wrap:nowrap;gap:0;padding:0;flex:1;min-height:0}
+  #chat .left{flex:0 0 auto;gap:8px;padding:8px 10px 10px}
+  #chat .stage{flex:none;height:40vh;height:40dvh;min-height:200px;border-radius:16px}
+  #chat .self{width:92px;height:70px;right:8px;bottom:8px}
+  #chat .tags{left:8px;top:8px;gap:6px}
+  #chat .tag{font-size:12px;padding:5px 10px}
+  #chat .status{font-size:16px}
+  #chat .ctrls{flex-wrap:nowrap;gap:10px}
+  #chat .round{width:46px;height:46px}
+  #chat .btn.big{min-height:46px;padding:0 18px;font-size:16px;flex:1}
+  #chat .right{flex:1;min-height:0;max-height:none;border-radius:18px 18px 0 0;border-width:1px 0 0}
+  #chat .tabs{padding:6px 8px}
+  #chat .tabs button{min-height:38px}
+  #chat #paneChat{min-height:0}
+  #chat .msgs{padding:12px;gap:7px}
+  #chat .hist{min-height:0}
+  #chat .send{padding:8px 10px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  #chat .send input{font-size:16px;min-height:44px}
+  .wrap{padding:28px 16px}
+  .toast{top:8px}
+}
 </style>
 </head>
 <body>
