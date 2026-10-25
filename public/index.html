@@ -245,13 +245,17 @@ function handle(m) {
 // ---------- matching and WebRTC ----------
 async function onMatched(m) {
   searching = false; clearChat(); closePC();
-  peerId = m.peerId; peerTags = m.peer; setTags(m.peer); setStatus('');
+  peerId = m.peerId; peerTags = m.peer; setTags(m.peer); setStatus(m.mode === 'video' && localStream ? 'Connecting video…' : '');
   sys('You are now chatting with a stranger from Uttarakhand. Say namaste.');
   if (m.mode === 'text' && mode === 'video') sys('This chat is text only because the other person is not sharing a camera.');
   if (m.mode === 'video' && localStream) {
     pc = new RTCPeerConnection({ iceServers });
     localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
-    pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; };
+    pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; setStatus(''); };
+    pc.oniceconnectionstatechange = () => {
+      if (!pc) return;
+      if (pc.iceConnectionState === 'failed') { setStatus('Video could not connect on this network.'); sys('Video could not connect on this network. Try Wi-Fi, or the site owner can add a TURN server.'); }
+    };
     pc.onicecandidate = (e) => e.candidate && out({ type: 'signal', data: { candidate: e.candidate } });
     if (m.initiator) {
       const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
