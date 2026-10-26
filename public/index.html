@@ -477,7 +477,7 @@ async function onMatched(m) {
   if (m.mode === 'video' && localStream) {
     pc = new RTCPeerConnection({ iceServers });
     localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
-    pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; setStatus(''); };
+    pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; setStatus(''); const pl = $('remote').play(); if (pl && pl.catch) pl.catch(() => {}); };
     pc.oniceconnectionstatechange = () => {
       if (!pc) return;
       if (pc.iceConnectionState === 'failed') { setStatus('Video could not connect on this network.'); sys('Video could not connect on this network. Try Wi-Fi, or the site owner can add a TURN server.'); }
@@ -489,14 +489,20 @@ async function onMatched(m) {
     }
   }
 }
-async function onSignal(d) {
+// Signals are handled one at a time, in order, and ICE candidates that arrive before the offer/answer are kept until it is set.
+let sigQ = Promise.resolve(), pendingCands = [];
+function onSignal(d) { sigQ = sigQ.then(() => handleSignal(d)).catch(() => {}); }
+async function handleSignal(d) {
   if (!pc) return;
   if (d.sdp) {
     await pc.setRemoteDescription(d.sdp);
+    for (const c of pendingCands.splice(0)) { try { await pc.addIceCandidate(c); } catch {} }
     if (d.sdp.type === 'offer') { const a = await pc.createAnswer(); await pc.setLocalDescription(a); out({ type: 'signal', data: { sdp: pc.localDescription } }); }
-  } else if (d.candidate) { try { await pc.addIceCandidate(d.candidate); } catch {} }
+  } else if (d.candidate) {
+    if (pc.remoteDescription) { try { await pc.addIceCandidate(d.candidate); } catch {} } else pendingCands.push(d.candidate);
+  }
 }
-function closePC() { if (pc) { pc.close(); pc = null; } $('remote').srcObject = null; }
+function closePC() { if (pc) { pc.close(); pc = null; } pendingCands = []; sigQ = Promise.resolve(); $('remote').srcObject = null; }
 
 // ---------- chat ui ----------
 function add(who, text) { const d = document.createElement('div'); d.className = 'm ' + who; d.textContent = text; $('msgs').appendChild(d); $('msgs').scrollTop = 1e9; }
