@@ -137,7 +137,8 @@ wss.on('connection', (ws, req) => {
     switch (m.type) {
       case 'join': {
         unpair(c); waiting.delete(c);
-        if (authOn) {
+        c.uid = null; // guests (no sign-in) have no uid and cannot make friends
+        if (authOn && m.auth) {
           const uid = await verifyUser(m.auth);
           if (!uid) { send(c, { type: 'auth-required' }); return; }
           if (blockedUids.has(uid)) { ws.close(4003, 'blocked'); return; }
