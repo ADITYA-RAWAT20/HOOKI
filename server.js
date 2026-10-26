@@ -110,7 +110,8 @@ function pair(a, b) {
   waiting.delete(a); waiting.delete(b);
   unpair(a); unpair(b);
   a.partner = b; b.partner = a;
-  const mode = a.mode === 'video' && b.mode === 'video' ? 'video' : 'text';
+  // Video when both chose video and at least one has a working camera (the other can watch without sharing).
+  const mode = a.mode === 'video' && b.mode === 'video' && (a.cam || b.cam) ? 'video' : 'text';
   send(a, { type: 'matched', initiator: true, mode, peerId: b.id, peerUid: b.uid || null, peer: publicProfile(b.profile) });
   send(b, { type: 'matched', initiator: false, mode, peerId: a.id, peerUid: a.uid || null, peer: publicProfile(a.profile) });
 }
@@ -150,6 +151,7 @@ wss.on('connection', (ws, req) => {
         // Only VIPs can choose who they meet; everyone else matches with anyone.
         c.want = c.vip ? { gender: clean(m.want && m.want.gender), city: clean(m.want && m.want.city), vibe: clean(m.want && m.want.vibe) } : {};
         c.mode = m.mode === 'video' ? 'video' : 'text';
+        c.cam = !!m.cam;
         search(c);
         break;
       }
