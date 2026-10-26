@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 const REPORTS_TO_BLOCK = 3;
 
 const app = express();
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // WebRTC relay settings. Free STUN always; add a TURN server with environment variables
@@ -20,6 +21,40 @@ app.get('/ice', (req, res) => {
   }
   res.json(iceServers);
 });
+
+// ---- VIP (Rs 50) via Razorpay. Needs env RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and VIP_SECRET (any long random text). ----
+const RZP_ID = process.env.RAZORPAY_KEY_ID, RZP_SECRET = process.env.RAZORPAY_KEY_SECRET;
+const VIP_SECRET = process.env.VIP_SECRET || crypto.randomBytes(32).toString('hex'); // set VIP_SECRET so VIP survives restarts
+const VIP_PRICE_PAISE = 5000;
+const signToken = (payId) => payId + '.' + crypto.createHmac('sha256', VIP_SECRET).update(payId).digest('hex');
+function isVipToken(t) {
+  const parts = String(t || '').split('.');
+  if (parts.length !== 2) return false;
+  const good = signToken(parts[0]).split('.')[1];
+  return parts[1].length === good.length && crypto.timingSafeEqual(Buffer.from(parts[1]), Buffer.from(good));
+}
+app.get('/vip/status', (req, res) => res.json({ enabled: !!(RZP_ID && RZP_SECRET) }));
+app.post('/vip/order', async (req, res) => {
+  if (!RZP_ID || !RZP_SECRET) return res.status(503).json({ error: 'Payments are not switched on yet.' });
+  try {
+    const r = await fetch('https://api.razorpay.com/v1/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Basic ' + Buffer.from(RZP_ID + ':' + RZP_SECRET).toString('base64') },
+      body: JSON.stringify({ amount: VIP_PRICE_PAISE, currency: 'INR', receipt: 'vip_' + Date.now() })
+    });
+    const o = await r.json();
+    if (!r.ok) return res.status(502).json({ error: 'Could not start payment.' });
+    res.json({ orderId: o.id, keyId: RZP_ID, amount: VIP_PRICE_PAISE });
+  } catch { res.status(502).json({ error: 'Could not start payment.' }); }
+});
+app.post('/vip/verify', (req, res) => {
+  const { razorpay_order_id: o, razorpay_payment_id: pay, razorpay_signature: sig } = req.body || {};
+  if (!RZP_SECRET || !o || !pay || !sig) return res.status(400).json({ error: 'Bad request.' });
+  const want = crypto.createHmac('sha256', RZP_SECRET).update(o + '|' + pay).digest('hex');
+  if (String(sig).length !== want.length || !crypto.timingSafeEqual(Buffer.from(String(sig)), Buffer.from(want))) return res.status(400).json({ error: 'Payment could not be verified.' });
+  res.json({ token: signToken(String(pay).replace(/[^A-Za-z0-9_]/g, '')) });
+});
+app.post('/vip/check', (req, res) => res.json({ vip: isVipToken(req.body && req.body.token) }));
 app.get('/healthz', (req, res) => res.send('ok'));
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
@@ -81,7 +116,9 @@ wss.on('connection', (ws, req) => {
       case 'join':
         unpair(c); waiting.delete(c);
         c.profile = { gender: clean(m.profile && m.profile.gender), city: clean(m.profile && m.profile.city), vibe: clean(m.profile && m.profile.vibe) };
-        c.want = { gender: clean(m.want && m.want.gender), city: clean(m.want && m.want.city), vibe: clean(m.want && m.want.vibe) };
+        c.vip = isVipToken(m.token);
+        // Only VIPs can choose who they meet; everyone else matches with anyone.
+        c.want = c.vip ? { gender: clean(m.want && m.want.gender), city: clean(m.want && m.want.city), vibe: clean(m.want && m.want.vibe) } : {};
         c.mode = m.mode === 'video' ? 'video' : 'text';
         search(c);
         break;
