@@ -38,6 +38,36 @@ label.h{font-weight:600;display:block;margin-bottom:10px;background:none;border:
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:16px}
 .vipbadge{display:inline-block;background:var(--accent);color:var(--ink);font:700 12px/1 'Instrument Sans',sans-serif;padding:4px 8px;border-radius:999px;vertical-align:middle;margin-left:6px}
 .note{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* ---------- profile / friends ---------- */
+:root{--u:1px}
+.avbtn{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent);padding:0;background:var(--bubble);overflow:hidden;flex:none}
+.avbtn img,.av{object-fit:cover}
+.av{width:44px;height:44px;border-radius:50%;background:var(--bubble);display:inline-grid;place-items:center;font-weight:700;color:var(--accent);flex:none;overflow:hidden}
+.av.big{width:84px;height:84px;font-size:32px}
+.hubtabs{display:flex;gap:6px}
+.hubtabs button{min-height:42px;padding:0 18px;border:0;border-radius:12px;background:transparent;color:var(--text);font-weight:600}
+.hubtabs button[aria-pressed=true]{background:var(--text);color:var(--ink)}
+.badge{display:inline-block;margin-left:6px;background:var(--accent);color:var(--ink);border-radius:999px;font-size:12px;padding:2px 7px}
+.hubbody{width:100%;max-width:640px;margin:0 auto;padding:18px 18px 40px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.avrow{display:flex;gap:16px;align-items:center}
+.myname{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.in{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bubble);color:var(--text);width:100%;min-width:0}
+input[type=file].in{padding:10px 14px;height:auto}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid .pt{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bubble)}
+.grid .pt img,.posts img{width:100%;height:100%;object-fit:cover;display:block}
+.grid .pt button{position:absolute;right:4px;top:4px;border:0;border-radius:8px;background:rgba(10,19,15,.8);color:var(--text);padding:4px 8px}
+.frow{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.frow .nm{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.frow .btn{min-height:40px;padding:0 16px;font-size:14px}
+.posts{display:flex;gap:8px;overflow-x:auto}
+.posts figure{margin:0;flex:0 0 140px}
+.posts img{height:140px;border-radius:10px}
+.posts figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+.tmsgs{display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+#starBtn[hidden]{display:none !important}
 /* chat */
 .body{flex:1;display:flex;flex-wrap:wrap;gap:20px;padding:20px 24px}
 .left{flex:2 1 520px;min-width:0;display:flex;flex-direction:column;gap:14px}
@@ -152,6 +182,33 @@ label.h{font-weight:600;display:block;margin-bottom:10px;background:none;border:
   .vipbadge{font-size:3.4vw;padding:1vw 2.2vw}
   #vipLock .note{font-size:4.2vw !important}
   .err{font-size:4vw}
+
+  /* profile / friends on phones */
+  :root{--u:calc(100vw / 360)}
+  #hub .top{padding:3vw 4vw;flex-wrap:nowrap;gap:2vw}
+  #hub .btn{min-height:12vw;font-size:4.4vw;padding:0 5vw;border-radius:3.5vw}
+  .hubtabs button{min-height:11vw;padding:0 4.5vw;font-size:4.2vw;border-radius:3.5vw}
+  .badge{font-size:3.2vw;padding:.4vw 1.8vw}
+  .hubbody{max-width:none;padding:4vw 4.5vw 12vw}
+  .stack{gap:4vw}
+  .avrow{gap:4vw}
+  .av{width:12vw;height:12vw;font-size:5vw}
+  .av.big{width:22vw;height:22vw;font-size:9vw}
+  .avbtn{width:11vw;height:11vw}
+  .myname{font-size:6vw}
+  .in{min-height:13vw;font-size:4.6vw;padding:0 4vw;border-radius:3.5vw}
+  input[type=file].in{padding:3vw 4vw;font-size:3.8vw}
+  #hub label.h{font-size:4.4vw}
+  #hub h3{font-size:5.6vw !important}
+  .grid{gap:2vw}
+  .frow{gap:3vw;padding:2.5vw 3vw;border-radius:4vw;font-size:4.4vw}
+  .frow .btn{min-height:10vw;font-size:3.8vw;padding:0 4vw}
+  .posts figure{flex-basis:36vw}
+  .posts img{height:36vw}
+  .posts figcaption{font-size:3.2vw}
+  .tmsgs{gap:2vw;padding:3vw;border-radius:4vw;font-size:4.2vw;max-height:45vh}
+  #chat .top .btn{padding:0 3.2vw}
+
 }
 </style>
 </head>
@@ -161,19 +218,23 @@ label.h{font-weight:600;display:block;margin-bottom:10px;background:none;border:
 <section id="landing" class="screen on">
   <div class="top">
     <div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 34 34"><path d="M5 25 L12 14 L16 20 L21 11 L29 25 Z" fill="#0E1A16"/></svg></span>HOOKI</div>
-    <span class="pill"><span class="dot"></span>Uttarakhand server</span>
+    <span class="row" style="flex-wrap:nowrap"><button class="avbtn" id="meBtn" hidden aria-label="My profile"></button><span class="pill"><span class="dot"></span>Uttarakhand server</span></span>
   </div>
   <div class="wrap hero" style="flex:1;justify-content:center">
     <span class="eyebrow">Video and text chat · Uttarakhand only</span>
     <h1>Talk to a stranger from the hills.</h1>
-    <p>HOOKI connects you with a random person in Uttarakhand, face to face or by text. No sign-up, no name, no profile.</p>
+    <p id="heroP">HOOKI connects you with a random person in Uttarakhand, face to face or by text. No sign-up, no name, no profile.</p>
     <div class="row" style="gap:14px">
       <input id="age" type="checkbox" style="width:22px;height:22px;accent-color:#F2B544">
       <label for="age">I am 18 or older and agree to the house rules.</label>
     </div>
-    <div class="row">
+    <div class="row" id="startRow">
       <button class="btn big" id="goVideo">Start video chat</button>
       <button class="btn big ghost" id="goText">Text only</button>
+    </div>
+    <div id="authBox" hidden>
+      <button class="btn big" id="googleBtn" type="button"><svg width="22" height="22" viewBox="0 0 48 48" style="margin-right:10px;vertical-align:-5px"><path fill="#4285F4" d="M45 24.5c0-1.6-.1-3.1-.4-4.5H24v8.6h11.8c-.5 2.7-2 5-4.4 6.5v5.4h7.1c4.1-3.8 6.5-9.4 6.5-16z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.4c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.6C8.1 41.3 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.4c-.4-1.3-.7-2.7-.7-4.4s.3-3 .7-4.4v-5.6H4.5C3 17 2 20.400 2 24s1 7 2.500 10l7.300-5.600z"/><path fill="#EA4335" d="M24 10.600c3.200 0 6.100 1.100 8.400 3.300l6.300-6.300C34.900 4.100 29.900 2 24 2 15.500 2 8.100 6.700 4.500 14l7.300 5.600c1.700-5.200 6.500-9 12.200-9z"/></svg>Continue with Google</button>
+      <p class="note" style="margin-top:12px">Sign-in is needed to chat. Strangers never see your name or photo; only people you both star can.</p>
     </div>
     <div id="ageErr" class="err" hidden>Please confirm you are 18 or older.</div>
     <p class="note">Be kind. Reported people are blocked. You can press Next at any moment.</p>
@@ -211,6 +272,7 @@ label.h{font-weight:600;display:block;margin-bottom:10px;background:none;border:
   <div class="top">
     <div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 34 34"><path d="M5 25 L12 14 L16 20 L21 11 L29 25 Z" fill="#0E1A16"/></svg></span>HOOKI</div>
     <div class="row"><span class="pill"><span class="dot"></span>Uttarakhand server · <span id="online">1</span> online</span>
+      <button class="btn ghost" id="starBtn" aria-label="Star this person" hidden>★ Star</button>
       <button class="btn ghost" id="report">Report</button>
       <button class="btn ghost" id="leave">Leave</button></div>
   </div>
@@ -242,6 +304,46 @@ label.h{font-weight:600;display:block;margin-bottom:10px;background:none;border:
   </div>
 </section>
 
+<!-- PROFILE + FRIENDS -->
+<section id="hub" class="screen">
+  <div class="top">
+    <button class="btn ghost" id="hubBack">← Back</button>
+    <div class="hubtabs"><button id="hpTab" aria-pressed="true">Profile</button><button id="hfTab" aria-pressed="false">Friends<span id="reqCount" class="badge" hidden></span></button></div>
+  </div>
+  <div class="hubbody">
+    <div id="hubProfile" class="stack">
+      <div class="avrow"><span id="myAv"></span><div class="stack" style="gap:6px;flex:1;min-width:0"><div id="myName" class="myname">Set up your profile</div><label class="btn ghost" for="avFile" style="display:inline-flex;align-items:center;justify-content:center">Change photo</label><input type="file" id="avFile" accept="image/*" hidden></div></div>
+      <div><label class="h" for="uname">Username</label><input class="in" id="uname" maxlength="20" placeholder="letters, numbers, _ (3-20)" autocapitalize="none" autocomplete="off"></div>
+      <div><label class="h" for="bio">About you</label><input class="in" id="bio" maxlength="120" placeholder="One line, optional"></div>
+      <button class="btn" id="saveProf">Save profile</button>
+      <div id="profMsg" class="note"></div>
+      <div class="card" id="postCard">
+        <h3 style="font-size:20px">Post a picture</h3>
+        <input class="in" id="postFile" type="file" accept="image/*">
+        <input class="in" id="postCap" maxlength="200" placeholder="Caption (optional)">
+        <button class="btn" id="postBtn">Post</button>
+        <p class="note">Only your friends can see your posts. Friends are people you and they have both starred.</p>
+        <div id="myPosts" class="grid"></div>
+      </div>
+      <button class="btn ghost" id="signOut">Sign out</button>
+    </div>
+    <div id="hubFriends" class="stack" hidden>
+      <div><label class="h" for="fsearch">Find someone by username</label>
+        <div class="row" style="flex-wrap:nowrap"><input class="in" id="fsearch" placeholder="username" autocapitalize="none" autocomplete="off"><button class="btn" id="fgo">Star</button></div></div>
+      <div id="fmsg" class="note"></div>
+      <div id="fReq" class="stack" hidden><label class="h">Starred you</label><div id="fReqList" class="stack"></div></div>
+      <div><label class="h">Friends</label><div id="fFriends" class="stack"></div></div>
+      <div id="fWaitBox" class="stack" hidden><label class="h">Waiting for them to star you back</label><div id="fWait" class="stack"></div></div>
+    </div>
+    <div id="thread" class="stack" hidden>
+      <div class="row" style="flex-wrap:nowrap"><button class="btn ghost" id="thBack">←</button><span id="thAv"></span><strong id="thName" class="myname"></strong></div>
+      <div id="thPosts" class="posts"></div>
+      <div id="thMsgs" class="tmsgs"></div>
+      <form class="row" id="thForm" style="flex-wrap:nowrap"><input class="in" id="thTxt" placeholder="Message" maxlength="1000" autocomplete="off"><button class="btn" type="submit">Send</button></form>
+    </div>
+  </div>
+</section>
+
 <div class="toast" id="toast" role="alert">
   <div><strong id="toastT">A stranger wants to talk again</strong><div class="note" id="toastB" style="color:#2C3A34"></div><div class="note" style="color:#2C3A34">Rejoining ends your current chat.</div></div>
   <div class="row"><button class="btn" id="tYes">Rejoin</button><button class="btn ghost" id="tNo">Not now</button><button class="btn ghost" id="tBlock">Block</button></div>
@@ -258,7 +360,7 @@ let want = { gender: '', city: '', vibe: '' };
 let mode = 'video';
 let iceServers = [{ urls: 'stun:stun.l.google.com:19302' }];
 let camNote = '';
-let ws, myId, pc, localStream, peerId = null, peerTags = null, history = [], pendingAsk = null, searching = false;
+let authOn = false, sb = null, authToken = '', me = null, peerUid = null, ws, myId, pc, localStream, peerId = null, peerTags = null, history = [], pendingAsk = null, searching = false;
 const ignored = new Set();
 
 // ---------- setup screen ----------
@@ -312,6 +414,7 @@ $('goVideo').onclick = () => gate('video');
 $('goText').onclick = () => gate('text');
 function gate(m) {
   if (!$('age').checked) { $('ageErr').hidden = false; return; }
+  if (authOn && !me) { openHub(true); return; }
   $('ageErr').hidden = true; mode = m; show('setup');
 }
 $('begin').onclick = () => { profile.city = $('city').value; want.city = vipOn ? $('wcity').value : ''; startChat(); };
@@ -345,10 +448,11 @@ async function startChat() {
   if (!ws || ws.readyState !== 1) await connect();
   join();
 }
-function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want: vipOn ? want : {}, mode, token: vipToken }); }
+function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want: vipOn ? want : {}, mode, token: vipToken, auth: authToken }); }
 
 function handle(m) {
   switch (m.type) {
+    case 'auth-required': authToken = ''; leaveToLanding(); refreshLanding(); sys('Please sign in again.'); break;
     case 'hello': myId = m.id; $('online').textContent = m.online; break;
     case 'searching': searching = true; setStatus('Looking for someone in Uttarakhand…'); break;
     case 'matched': onMatched(m); break;
@@ -364,7 +468,7 @@ function handle(m) {
 // ---------- matching and WebRTC ----------
 async function onMatched(m) {
   searching = false; clearChat(); closePC();
-  peerId = m.peerId; peerTags = m.peer; setTags(m.peer); setStatus(m.mode === 'video' && localStream ? 'Connecting video…' : '');
+  peerId = m.peerId; peerUid = m.peerUid || null; $('starBtn').hidden = !(authOn && peerUid); peerTags = m.peer; setTags(m.peer); setStatus(m.mode === 'video' && localStream ? 'Connecting video…' : '');
   sys('You are now chatting with a stranger from Uttarakhand. Say namaste.');
   if (camNote) sys(camNote);
   if (m.mode === 'text' && mode === 'video') sys('This chat is text only because the other person is not sharing a camera.');
@@ -408,7 +512,8 @@ $('form').onsubmit = (e) => { e.preventDefault(); const t = $('txt').value.trim(
 $('next').onclick = () => { remember(); closePC(); setTags(null); peerId = null; join2(); };
 function join2() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'next' }); }
 $('report').onclick = () => { if (!peerId) return; out({ type: 'report', reason: 'user report' }); sys('Reported. Thank you.'); $('next').click(); };
-$('leave').onclick = () => { out({ type: 'stop' }); closePC(); if (localStream) localStream.getTracks().forEach((t) => t.stop()); localStream = null; peerId = null; setTags(null); show('landing'); };
+function leaveToLanding() { out({ type: 'stop' }); closePC(); if (localStream) localStream.getTracks().forEach((t) => t.stop()); localStream = null; peerId = null; setTags(null); show('landing'); }
+$('leave').onclick = leaveToLanding;
 $('mic').onclick = (e) => toggle(e.currentTarget, 'audio');
 $('cam').onclick = (e) => toggle(e.currentTarget, 'video');
 async function retryMedia() {
@@ -469,6 +574,186 @@ function showAsk(m) {
 $('tYes').onclick = () => { $('toast').classList.remove('on'); if (pendingAsk) out({ type: 'accept', to: pendingAsk.from }); pendingAsk = null; };
 $('tNo').onclick = () => { $('toast').classList.remove('on'); pendingAsk = null; };
 $('tBlock').onclick = () => { if (pendingAsk) { ignored.add(pendingAsk.from); out({ type: 'block', to: pendingAsk.from }); } $('toast').classList.remove('on'); pendingAsk = null; };
+
+// ================= Google sign-in, profile, friends =================
+const el = (tag, props, ...kids) => { const n = document.createElement(tag); Object.assign(n, props || {}); kids.forEach((k) => n.append(k)); return n; };
+function avatar(url, name, big) {
+  if (url) { const i = el('img', { src: url, alt: '', className: 'av' + (big ? ' big' : ''), loading: 'lazy' }); return i; }
+  return el('span', { className: 'av' + (big ? ' big' : ''), textContent: (name || '?').slice(0, 1).toUpperCase() });
+}
+async function shrink(file, max, q) {
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  return new Promise((r) => c.toBlob(r, 'image/jpeg', q));
+}
+async function uploadPhoto(file, max) {
+  const blob = await shrink(file, max, 0.82);
+  const path = me.id + '/' + (crypto.randomUUID ? crypto.randomUUID() : Date.now()) + '.jpg';
+  const { error } = await sb.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg' });
+  if (error) throw error;
+  return sb.storage.from('photos').getPublicUrl(path).data.publicUrl;
+}
+
+function refreshLanding() {
+  const signedIn = !authOn || !!authToken;
+  if (authOn) $('heroP').textContent = 'HOOKI connects you with a random person in Uttarakhand, face to face or by text. Strangers stay anonymous: they never see your name or photo.';
+  $('startRow').hidden = !signedIn; $('authBox').hidden = signedIn; $('meBtn').hidden = !(authOn && authToken && me);
+  if (me) { const b = $('meBtn'); b.replaceChildren(me.avatar_url ? el('img', { src: me.avatar_url, alt: '', style: 'width:100%;height:100%;object-fit:cover' }) : el('span', { textContent: me.username.slice(0, 1).toUpperCase(), style: 'font-weight:700;color:#F2B544' })); }
+}
+async function loadMe(session) {
+  authToken = session ? session.access_token : '';
+  if (!session) { me = null; refreshLanding(); return; }
+  const { data } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+  me = data || null; me && (me.id = session.user.id);
+  if (!me) me = null;
+  window.__uid = session.user.id;
+  refreshLanding();
+  if (me) subscribeMessages(); else openHub(true);
+}
+async function initAuth() {
+  let cfg = { auth: false };
+  try { cfg = await (await fetch('/config')).json(); } catch {}
+  if (!cfg.auth) { refreshLanding(); return; }
+  authOn = true;
+  await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); }).catch(() => {});
+  if (!window.supabase) { authOn = false; refreshLanding(); return; }
+  sb = supabase.createClient(cfg.url, cfg.anonKey);
+  refreshLanding();
+  sb.auth.onAuthStateChange((ev, session) => { if (ev === 'TOKEN_REFRESHED' && session) { authToken = session.access_token; return; } if (ev === 'SIGNED_OUT') { me = null; authToken = ''; refreshLanding(); return; } });
+  const { data } = await sb.auth.getSession();
+  await loadMe(data.session);
+}
+$('googleBtn').onclick = () => {
+  if (!$('age').checked) { $('ageErr').hidden = false; return; }
+  sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin } });
+};
+$('meBtn').onclick = () => openHub(false);
+$('signOut').onclick = async () => { await sb.auth.signOut(); me = null; authToken = ''; show('landing'); refreshLanding(); };
+
+// ---- hub ----
+let forced = false, hubTab = 'p', openFriend = null, msgChan = null;
+function openHub(force) { forced = !!force; $('hubBack').hidden = forced; $('hfTab').disabled = forced; fillProfile(); setTab('p'); show('hub'); }
+$('hubBack').onclick = () => { show('landing'); };
+function setTab(t) {
+  hubTab = t; $('hpTab').setAttribute('aria-pressed', t === 'p'); $('hfTab').setAttribute('aria-pressed', t === 'f');
+  $('hubProfile').hidden = t !== 'p'; $('hubFriends').hidden = t !== 'f'; $('thread').hidden = true; openFriend = null;
+  if (t === 'f') loadFriends(); else loadMyPosts();
+}
+$('hpTab').onclick = () => setTab('p'); $('hfTab').onclick = () => { if (!forced) setTab('f'); };
+function fillProfile() {
+  $('uname').value = me ? me.username : ''; $('bio').value = me ? (me.bio || '') : '';
+  $('myAv').replaceChildren(avatar(me && me.avatar_url, me ? me.username : '?', true)); $('myName').textContent = me ? '@' + me.username : 'Set up your profile';
+  $('postCard').hidden = !me; $('profMsg').textContent = me ? '' : 'Pick a username to start. Strangers never see it.';
+}
+async function saveProfile(extra) {
+  const username = $('uname').value.trim().toLowerCase();
+  if (!/^[a-z0-9_]{3,20}$/.test(username)) { $('profMsg').textContent = 'Username: 3 to 20 letters, numbers or _.'; return false; }
+  const row = Object.assign({ id: window.__uid, username, bio: $('bio').value.trim().slice(0, 120), avatar_url: me ? me.avatar_url : null }, extra || {});
+  const { error } = await sb.from('profiles').upsert(row);
+  if (error) { $('profMsg').textContent = error.code === '23505' ? 'That username is taken.' : 'Could not save. Try again.'; return false; }
+  const first = !me; me = row; fillProfile(); refreshLanding(); $('profMsg').textContent = 'Saved.';
+  if (first) { forced = false; $('hubBack').hidden = false; $('hfTab').disabled = false; subscribeMessages(); }
+  return true;
+}
+$('saveProf').onclick = () => saveProfile();
+$('avFile').onchange = async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  if (!me && !(await saveProfile())) return;
+  $('profMsg').textContent = 'Uploading…';
+  try { const url = await uploadPhoto(f, 512); await saveProfile({ avatar_url: url }); } catch { $('profMsg').textContent = 'Could not upload the photo.'; }
+  e.target.value = '';
+};
+async function loadMyPosts() {
+  if (!me) return;
+  const { data } = await sb.from('posts').select('*').eq('user_id', me.id).order('created_at', { ascending: false }).limit(30);
+  $('myPosts').replaceChildren(...(data || []).map((p) => el('div', { className: 'pt' }, el('img', { src: p.image_url, alt: p.caption || '', loading: 'lazy' }), el('button', { textContent: 'Delete', onclick: async () => { await sb.from('posts').delete().eq('id', p.id); loadMyPosts(); } }))));
+}
+$('postBtn').onclick = async () => {
+  const f = $('postFile').files[0]; if (!f) { $('profMsg').textContent = 'Choose a picture first.'; return; }
+  $('profMsg').textContent = 'Posting…';
+  try {
+    const url = await uploadPhoto(f, 1080);
+    const { error } = await sb.from('posts').insert({ user_id: me.id, image_url: url, caption: $('postCap').value.trim().slice(0, 200) });
+    if (error) throw error;
+    $('postFile').value = ''; $('postCap').value = ''; $('profMsg').textContent = 'Posted. Your friends can see it.'; loadMyPosts();
+  } catch { $('profMsg').textContent = 'Could not post the picture.'; }
+};
+
+// ---- stars and friends ----
+async function starUser(id) {
+  const { error } = await sb.from('stars').insert({ user_id: me.id, friend_id: id });
+  return !error || error.code === '23505';
+}
+async function isMutual(id) {
+  const { data } = await sb.from('stars').select('user_id').eq('user_id', id).eq('friend_id', me.id).maybeSingle();
+  return !!data;
+}
+$('starBtn').onclick = async () => {
+  if (!me) { sys('Set up your profile first (tap your picture on the start page).'); return; }
+  if (!peerUid) return;
+  if (!(await starUser(peerUid))) { sys('Could not star this person.'); return; }
+  sys((await isMutual(peerUid)) ? 'You are now friends! Find them under Profile → Friends.' : 'Starred. If they star you back, you become friends and can message each other.');
+};
+async function loadFriends() {
+  if (!me) return;
+  const { data: rows } = await sb.from('stars').select('user_id,friend_id');
+  const mine = new Set((rows || []).filter((r) => r.user_id === me.id).map((r) => r.friend_id));
+  const theirs = new Set((rows || []).filter((r) => r.friend_id === me.id).map((r) => r.user_id));
+  const ids = [...new Set([...mine, ...theirs])];
+  const profs = {};
+  if (ids.length) { const { data } = await sb.from('profiles').select('id,username,avatar_url').in('id', ids); (data || []).forEach((p) => (profs[p.id] = p)); }
+  const row = (p, ...btns) => el('div', { className: 'frow' }, avatar(p.avatar_url, p.username), el('span', { className: 'nm', textContent: '@' + p.username }), ...btns);
+  const friends = ids.filter((i) => mine.has(i) && theirs.has(i) && profs[i]);
+  const req = ids.filter((i) => theirs.has(i) && !mine.has(i) && profs[i]);
+  const wait = ids.filter((i) => mine.has(i) && !theirs.has(i) && profs[i]);
+  $('fFriends').replaceChildren(...(friends.length ? friends.map((i) => row(profs[i], el('button', { className: 'btn', textContent: 'Message', onclick: () => openThread(profs[i]) }))) : [el('p', { className: 'note', textContent: 'No friends yet. Star someone in a chat, or by username above. When they star you back, they appear here.' })]));
+  $('fReqList').replaceChildren(...req.map((i) => row(profs[i], el('button', { className: 'btn', textContent: 'Star back', onclick: async () => { await starUser(i); loadFriends(); } }))));
+  $('fReq').hidden = !req.length;
+  $('fWait').replaceChildren(...wait.map((i) => row(profs[i])));
+  $('fWaitBox').hidden = !wait.length;
+  $('reqCount').textContent = req.length; $('reqCount').hidden = !req.length;
+}
+$('fgo').onclick = async () => {
+  const q = $('fsearch').value.trim().toLowerCase().replace(/^@/, ''); if (!q) return;
+  const { data } = await sb.from('profiles').select('id,username').eq('username', q).maybeSingle();
+  if (!data) { $('fmsg').textContent = 'Nobody with that username.'; return; }
+  if (data.id === me.id) { $('fmsg').textContent = 'That is you.'; return; }
+  await starUser(data.id); $('fsearch').value = '';
+  $('fmsg').textContent = (await isMutual(data.id)) ? 'You are friends now.' : 'Starred @' + data.username + '. When they star you back, you can message.'; loadFriends();
+};
+
+// ---- messages with friends ----
+function bubble(m) { return el('div', { className: 'm ' + (m.from_id === me.id ? 'me' : 'them'), textContent: m.body }); }
+async function openThread(p) {
+  openFriend = p; $('hubFriends').hidden = true; $('thread').hidden = false;
+  $('thName').textContent = '@' + p.username; $('thAv').replaceChildren(avatar(p.avatar_url, p.username));
+  const [{ data: posts }, { data: msgs }] = await Promise.all([
+    sb.from('posts').select('*').eq('user_id', p.id).order('created_at', { ascending: false }).limit(12),
+    sb.from('messages').select('*').or('and(from_id.eq.' + me.id + ',to_id.eq.' + p.id + '),and(from_id.eq.' + p.id + ',to_id.eq.' + me.id + ')').order('created_at', { ascending: true }).limit(100)
+  ]);
+  $('thPosts').replaceChildren(...(posts || []).map((x) => el('figure', {}, el('img', { src: x.image_url, alt: '', loading: 'lazy' }), el('figcaption', { textContent: x.caption || '' }))));
+  $('thPosts').hidden = !(posts && posts.length);
+  const box = $('thMsgs'); box.replaceChildren(...(msgs || []).map(bubble)); box.scrollTop = box.scrollHeight;
+}
+$('thBack').onclick = () => { $('thread').hidden = true; $('hubFriends').hidden = false; openFriend = null; loadFriends(); };
+$('thForm').onsubmit = async (e) => {
+  e.preventDefault(); const body = $('thTxt').value.trim(); if (!body || !openFriend) return;
+  $('thTxt').value = '';
+  const { data, error } = await sb.from('messages').insert({ from_id: me.id, to_id: openFriend.id, body }).select().single();
+  if (error) { $('thMsgs').append(el('div', { className: 'm sys', textContent: 'Could not send. You must both have starred each other.' })); return; }
+  $('thMsgs').append(bubble(data)); $('thMsgs').scrollTop = $('thMsgs').scrollHeight;
+};
+function subscribeMessages() {
+  if (msgChan || !me) return;
+  msgChan = sb.channel('msgs-' + me.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'to_id=eq.' + me.id }, (pl) => {
+    const m = pl.new;
+    if (openFriend && m.from_id === openFriend.id && !$('thread').hidden) { $('thMsgs').append(bubble(m)); $('thMsgs').scrollTop = $('thMsgs').scrollHeight; }
+    else { $('reqCount').hidden = false; $('reqCount').textContent = '•'; }
+  }).subscribe();
+}
+initAuth();
 </script>
 </body>
 </html>
