@@ -55,6 +55,26 @@ app.post('/vip/verify', (req, res) => {
   res.json({ token: signToken(String(pay).replace(/[^A-Za-z0-9_]/g, '')) });
 });
 app.post('/vip/check', (req, res) => res.json({ vip: isVipToken(req.body && req.body.token) }));
+// ---- Google sign-in via Supabase. Needs env SUPABASE_URL and SUPABASE_ANON_KEY. Without them the site stays anonymous. ----
+const SB_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, ''), SB_ANON = process.env.SUPABASE_ANON_KEY;
+const authOn = !!(SB_URL && SB_ANON);
+app.get('/config', (req, res) => res.json(authOn ? { auth: true, url: SB_URL, anonKey: SB_ANON } : { auth: false }));
+const tokenCache = new Map(); // token -> { id, exp }
+async function verifyUser(token) {
+  token = String(token || '');
+  if (!token) return null;
+  const hit = tokenCache.get(token);
+  if (hit && hit.exp > Date.now()) return hit.id;
+  try {
+    const r = await fetch(SB_URL + '/auth/v1/user', { headers: { apikey: SB_ANON, Authorization: 'Bearer ' + token } });
+    if (!r.ok) return null;
+    const u = await r.json();
+    if (!u || !u.id) return null;
+    tokenCache.set(token, { id: u.id, exp: Date.now() + 5 * 60 * 1000 });
+    if (tokenCache.size > 2000) tokenCache.clear();
+    return u.id;
+  } catch { return null; }
+}
 app.get('/healthz', (req, res) => res.send('ok'));
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
@@ -63,6 +83,8 @@ const clients = new Map(); // id -> client
 const waiting = new Set(); // clients searching
 const reportCount = new Map(); // ip -> count
 const blockedIps = new Set();
+const blockedUids = new Set();
+const reportCountUid = new Map();
 
 const clean = (v, max = 40) => String(v || '').slice(0, max);
 const publicProfile = (p) => ({ gender: p.gender, city: p.city, vibe: p.vibe });
@@ -89,8 +111,8 @@ function pair(a, b) {
   unpair(a); unpair(b);
   a.partner = b; b.partner = a;
   const mode = a.mode === 'video' && b.mode === 'video' ? 'video' : 'text';
-  send(a, { type: 'matched', initiator: true, mode, peerId: b.id, peer: publicProfile(b.profile) });
-  send(b, { type: 'matched', initiator: false, mode, peerId: a.id, peer: publicProfile(a.profile) });
+  send(a, { type: 'matched', initiator: true, mode, peerId: b.id, peerUid: b.uid || null, peer: publicProfile(b.profile) });
+  send(b, { type: 'matched', initiator: false, mode, peerId: a.id, peerUid: a.uid || null, peer: publicProfile(a.profile) });
 }
 
 function search(c) {
@@ -110,11 +132,18 @@ wss.on('connection', (ws, req) => {
   clients.set(c.id, c);
   send(c, { type: 'hello', id: c.id, online: clients.size });
 
-  ws.on('message', (raw) => {
+  ws.on('message', async (raw) => {
     let m; try { m = JSON.parse(raw); } catch { return; }
     switch (m.type) {
-      case 'join':
+      case 'join': {
         unpair(c); waiting.delete(c);
+        if (authOn) {
+          const uid = await verifyUser(m.auth);
+          if (!uid) { send(c, { type: 'auth-required' }); return; }
+          if (blockedUids.has(uid)) { ws.close(4003, 'blocked'); return; }
+          c.uid = uid;
+        }
+        if (ws.readyState !== 1) return;
         c.profile = { gender: clean(m.profile && m.profile.gender), city: clean(m.profile && m.profile.city), vibe: clean(m.profile && m.profile.vibe) };
         c.vip = isVipToken(m.token);
         // Only VIPs can choose who they meet; everyone else matches with anyone.
@@ -122,6 +151,7 @@ wss.on('connection', (ws, req) => {
         c.mode = m.mode === 'video' ? 'video' : 'text';
         search(c);
         break;
+      }
       case 'next':
         unpair(c); waiting.delete(c); search(c);
         break;
@@ -147,6 +177,7 @@ wss.on('connection', (ws, req) => {
         const n = (reportCount.get(bad.ip) || 0) + 1;
         reportCount.set(bad.ip, n);
         console.log('REPORT', bad.id, 'count', n, 'reason:', clean(m.reason, 80));
+        if (bad.uid) { const k = (reportCountUid.get(bad.uid) || 0) + 1; reportCountUid.set(bad.uid, k); if (k >= REPORTS_TO_BLOCK) { blockedUids.add(bad.uid); bad.ws.close(4003, 'blocked'); } }
         if (n >= REPORTS_TO_BLOCK) { blockedIps.add(bad.ip); bad.ws.close(4003, 'blocked'); }
         break;
       }
