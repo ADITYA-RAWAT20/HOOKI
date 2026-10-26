@@ -34,8 +34,9 @@ button{cursor:pointer}
 .chip{min-height:44px;padding:0 20px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--text);font-weight:600}
 .chip[aria-pressed=true]{background:var(--accent);color:var(--ink);border-color:var(--accent)}
 select{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bubble);color:var(--text);max-width:320px}
-label.h{font-weight:600;display:block;margin-bottom:10px}
+label.h{font-weight:600;display:block;margin-bottom:10px;background:none;border:0;padding:0;border-radius:0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.vipbadge{display:inline-block;background:var(--accent);color:var(--ink);font:700 12px/1 'Instrument Sans',sans-serif;padding:4px 8px;border-radius:999px;vertical-align:middle;margin-left:6px}
 .note{font-size:13px;color:var(--muted);line-height:1.5}
 /* chat */
 .body{flex:1;display:flex;flex-wrap:wrap;gap:20px;padding:20px 24px}
@@ -49,6 +50,7 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
 .tag{background:rgba(10,19,15,.8);border-radius:999px;padding:7px 13px;font-size:14px}
 .tag.v{background:var(--accent);color:var(--ink);font-weight:600}
 .status{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font-size:20px;color:#D9D6CB;z-index:1}
+[hidden]{display:none !important}
 .navonly{display:none}
 .ctrls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .round{width:54px;height:54px;border-radius:50%;border:1px solid var(--line2);background:#1E3D34;color:var(--text);display:grid;place-items:center}
@@ -119,6 +121,38 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
   #chat.showrecent #navRecent{background:var(--text);color:var(--ink)}
   .toast{top:2vw;font-size:4vw}
 }
+
+/* ---------- phone: landing + setup screens, sizes scale with screen width ---------- */
+@media (max-width:900px),(pointer:coarse) and (max-width:1200px){
+  #landing .top,#setup .top{padding:3vw 5vw;gap:3vw;flex-wrap:nowrap}
+  #landing .brand,#setup .brand{font-size:7vw;gap:2.5vw}
+  #landing .logo,#setup .logo{width:10vw;height:10vw;border-radius:2.8vw}
+  #landing .logo svg,#setup .logo svg{width:6vw;height:6vw}
+  #landing .pill,#setup .pill{font-size:3.4vw;padding:1.6vw 3.4vw;gap:2vw}
+  #landing .dot,#setup .dot{width:2.2vw;height:2.2vw}
+  #landing .wrap,#setup .wrap{padding:6vw 5.5vw 10vw;gap:6vw}
+  #landing .wrap.hero{justify-content:center;padding-bottom:14vw}
+  .eyebrow{font-size:3.4vw}
+  .hero h1{font-size:12vw;line-height:1.05}
+  .hero p{font-size:4.8vw;max-width:none}
+  #setup h2{font-size:9vw !important;line-height:1.1}
+  #setup h3{font-size:5.6vw !important}
+  #landing .row,#setup .row{gap:2.5vw}
+  #landing .row[style]{gap:3.5vw !important;flex-wrap:nowrap}
+  #age{width:7vw !important;height:7vw !important;flex:none}
+  #landing label{font-size:4.4vw}
+  #landing .btn.big,#setup .btn.big{min-height:15vw;padding:0 6vw;font-size:5.2vw;border-radius:4vw;flex:1 1 auto}
+  #landing .row:has(#goVideo){flex-direction:column;align-items:stretch}
+  .btn{min-height:13vw;font-size:4.6vw;padding:0 6vw;border-radius:3.5vw}
+  .chip{min-height:12vw;padding:0 5vw;font-size:4.4vw;border-radius:3.5vw}
+  label.h{font-size:4.6vw;margin-bottom:2.5vw;padding:0}
+  select{min-height:13vw;font-size:4.6vw;border-radius:3.5vw;max-width:none;width:100%;padding:0 4vw}
+  .card{padding:5vw;gap:5vw;border-radius:5vw}
+  .note{font-size:3.8vw}
+  .vipbadge{font-size:3.4vw;padding:1vw 2.2vw}
+  #vipLock .note{font-size:4.2vw !important}
+  .err{font-size:4vw}
+}
 </style>
 </head>
 <body>
@@ -154,12 +188,18 @@ label.h{font-weight:600;display:block;margin-bottom:10px}
     <div><label class="h">I am a</label><div class="row" id="gRow"></div></div>
     <div><label class="h" for="city">My city or town</label><select id="city"></select></div>
     <div><label class="h">My vibe</label><div class="row" id="vRow"></div></div>
-    <div class="card">
-      <h3 style="font-size:20px">Who do you want to meet?</h3>
+    <div class="card" id="vipOpen" hidden>
+      <h3 style="font-size:20px">Who do you want to meet? <span class="vipbadge">VIP</span></h3>
       <div><label class="h">Gender</label><div class="row" id="wgRow"></div></div>
       <div><label class="h" for="wcity">City or town</label><select id="wcity"></select></div>
       <div><label class="h">Vibe</label><div class="row" id="wvRow"></div></div>
-      <p class="note">Matching is free in this build. Tighter filters mean longer waits, so keep them wide if nobody shows up.</p>
+      <p class="note">Tighter filters mean longer waits, so keep them wide if nobody shows up.</p>
+    </div>
+    <div class="card" id="vipLock">
+      <h3 style="font-size:20px">Choose who you meet <span class="vipbadge">VIP</span></h3>
+      <p class="note" style="font-size:15px">Pick the gender, city and vibe of the people you talk to. One payment of ₹50.</p>
+      <button class="btn big" id="buyVip" type="button">Buy VIP · ₹50</button>
+      <div id="vipMsg" class="note"></div>
     </div>
     <div class="row"><button class="btn big" id="begin">Start chatting</button><button class="btn big ghost" id="skip">Skip, stay anonymous</button></div>
     <p class="note">Tags are self-declared and not verified. Playful is fine; explicit behaviour gets you banned.</p>
@@ -239,14 +279,43 @@ chips('wvRow', [{ label: 'Any', value: '' }, { label: 'Chill', value: 'Chill' },
   $(id).innerHTML = '<option value="">' + first + '</option>' + CITIES.map((c) => '<option>' + c + '</option>').join('');
 });
 
+
+// ---- VIP ----
+let vipToken = ''; try { vipToken = localStorage.getItem('hooki_vip') || ''; } catch {}
+let vipOn = false;
+function showVip() { $('vipOpen').hidden = !vipOn; $('vipLock').hidden = vipOn; if (!vipOn) Object.assign(want, { gender: '', city: '', vibe: '' }); }
+async function initVip() {
+  if (vipToken) { try { vipOn = !!(await (await fetch('/vip/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: vipToken }) })).json()).vip; } catch {} if (!vipOn) { vipToken = ''; try { localStorage.removeItem('hooki_vip'); } catch {} } }
+  try { const st = await (await fetch('/vip/status')).json(); if (!st.enabled && !vipOn) { $('buyVip').disabled = true; $('buyVip').textContent = 'VIP coming soon'; $('vipMsg').textContent = 'Payments are not switched on yet.'; } } catch {}
+  showVip();
+}
+$('buyVip').onclick = async () => {
+  const msg = $('vipMsg'); msg.textContent = 'Opening payment…';
+  try {
+    if (!window.Razorpay) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://checkout.razorpay.com/v1/checkout.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+    const o = await (await fetch('/vip/order', { method: 'POST' })).json();
+    if (!o.orderId) { msg.textContent = o.error || 'Could not start payment.'; return; }
+    new Razorpay({
+      key: o.keyId, amount: o.amount, currency: 'INR', order_id: o.orderId, name: 'HOOKI VIP', description: 'Choose who you meet',
+      theme: { color: '#F2B544' },
+      handler: async (r) => {
+        const v = await (await fetch('/vip/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) })).json();
+        if (v.token) { vipToken = v.token; vipOn = true; try { localStorage.setItem('hooki_vip', v.token); } catch {} showVip(); msg.textContent = ''; } else msg.textContent = v.error || 'Payment could not be verified.';
+      },
+      modal: { ondismiss: () => { msg.textContent = ''; } }
+    }).open();
+  } catch { msg.textContent = 'Could not open payment. Check your internet and try again.'; }
+};
+initVip();
+
 $('goVideo').onclick = () => gate('video');
 $('goText').onclick = () => gate('text');
 function gate(m) {
   if (!$('age').checked) { $('ageErr').hidden = false; return; }
   $('ageErr').hidden = true; mode = m; show('setup');
 }
-$('begin').onclick = () => { profile.city = $('city').value; want.city = $('wcity').value; startChat(); };
-$('skip').onclick = () => { profile = { gender: '', city: '', vibe: '' }; want = { gender: '', city: '', vibe: '' }; startChat(); };
+$('begin').onclick = () => { profile.city = $('city').value; want.city = vipOn ? $('wcity').value : ''; startChat(); };
+$('skip').onclick = () => { profile.gender = profile.city = profile.vibe = ''; Object.assign(want, { gender: '', city: '', vibe: '' }); startChat(); };
 
 // ---------- connection ----------
 function connect() {
@@ -276,7 +345,7 @@ async function startChat() {
   if (!ws || ws.readyState !== 1) await connect();
   join();
 }
-function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want, mode }); }
+function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want: vipOn ? want : {}, mode, token: vipToken }); }
 
 function handle(m) {
   switch (m.type) {
