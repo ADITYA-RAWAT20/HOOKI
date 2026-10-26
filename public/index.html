@@ -433,16 +433,23 @@ function connect() {
 }
 const out = (m) => ws && ws.readyState === 1 && ws.send(JSON.stringify(m));
 
+// Camera and microphone together if possible, otherwise the camera alone.
+async function getMedia() {
+  try { return await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); }
+  catch (e1) {
+    try { return await navigator.mediaDevices.getUserMedia({ video: true }); } catch { throw e1; }
+  }
+}
 async function startChat() {
   show('chat');
   $('selfBox').style.display = mode === 'video' ? 'block' : 'none';
   if (mode === 'video') {
     try {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localStream = await getMedia();
       $('local').srcObject = localStream;
     } catch (err) {
-      mode = 'text'; $('selfBox').style.display = 'none';
-      camNote = 'Camera or microphone could not start (' + (err && err.name ? err.name : 'unknown') + '). This is a text chat. Press the camera button to try again.';
+      $('selfBox').style.display = 'none';
+      camNote = 'Your camera could not start (' + (err && err.name ? err.name : 'unknown') + '). You can still watch other people, but they cannot see you. Press the camera button to try again.';
       sys(camNote);
     }
   }
@@ -450,7 +457,7 @@ async function startChat() {
   if (!ws || ws.readyState !== 1) await connect();
   join();
 }
-function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want: vipOn ? want : {}, mode, token: vipToken, auth: authToken }); }
+function join() { clearChat(); setStatus('Looking for someone in Uttarakhand…'); out({ type: 'join', profile, want: vipOn ? want : {}, mode, cam: !!(localStream && localStream.getVideoTracks().length), token: vipToken, auth: authToken }); }
 
 function handle(m) {
   switch (m.type) {
@@ -470,13 +477,16 @@ function handle(m) {
 // ---------- matching and WebRTC ----------
 async function onMatched(m) {
   searching = false; clearChat(); closePC();
-  peerId = m.peerId; peerUid = m.peerUid || null; $('starBtn').hidden = !(authOn && peerUid); peerTags = m.peer; setTags(m.peer); setStatus(m.mode === 'video' && localStream ? 'Connecting video…' : '');
+  peerId = m.peerId; peerUid = m.peerUid || null; $('starBtn').hidden = !(authOn && peerUid); peerTags = m.peer; setTags(m.peer); setStatus(m.mode === 'video' ? 'Connecting video…' : '');
   sys('You are now chatting with a stranger from Uttarakhand. Say namaste.');
   if (camNote) sys(camNote);
-  if (m.mode === 'text' && mode === 'video') sys('This chat is text only because the other person is not sharing a camera.');
-  if (m.mode === 'video' && localStream) {
+  if (m.mode === 'text' && mode === 'video') sys('This chat is text only because neither of you is sharing a camera.');
+  if (m.mode === 'video' && !localStream) sys('You have no camera, so you can see them but they cannot see you.');
+  if (m.mode === 'video') {
     pc = new RTCPeerConnection({ iceServers });
-    localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+    if (localStream) localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+    if (!localStream || !localStream.getAudioTracks().length) pc.addTransceiver('audio', { direction: 'recvonly' });
+    if (!localStream || !localStream.getVideoTracks().length) pc.addTransceiver('video', { direction: 'recvonly' });
     pc.ontrack = (e) => { $('remote').srcObject = e.streams[0]; setStatus(''); const pl = $('remote').play(); if (pl && pl.catch) pl.catch(() => {}); };
     pc.oniceconnectionstatechange = () => {
       if (!pc) return;
@@ -526,7 +536,7 @@ $('mic').onclick = (e) => toggle(e.currentTarget, 'audio');
 $('cam').onclick = (e) => toggle(e.currentTarget, 'video');
 async function retryMedia() {
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localStream = await getMedia();
     $('local').srcObject = localStream; $('selfBox').style.display = 'block';
     mode = 'video'; camNote = ''; sys('Camera is on. Finding you a video chat…');
     join();
